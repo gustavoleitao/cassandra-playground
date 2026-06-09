@@ -11,6 +11,7 @@ export interface QueryResult {
   rows: Record<string, unknown>[];
   rowCount: number;
   executionTime: number;
+  statementsExecuted: number;
 }
 
 export interface ColumnInfo {

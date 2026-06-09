@@ -24,9 +24,13 @@ export function ResultsPane({ result, error, loading }: Props) {
   }
 
   if (result.columns.length === 0) {
+    const label =
+      result.statementsExecuted > 1
+        ? `${result.statementsExecuted} statements executed successfully.`
+        : 'Query executed successfully.';
     return (
       <div className="results-pane results-empty">
-        Query executed successfully. {result.executionTime}ms
+        {label} {result.executionTime}ms
       </div>
     );
   }

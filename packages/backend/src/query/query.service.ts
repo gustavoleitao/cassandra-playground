@@ -8,16 +8,25 @@ export class QueryService {
 
   async execute(dto: ExecuteQueryDto) {
     const client = this.cassandraService.getClient();
+    const statements = this.splitStatements(dto.cql);
     const start = Date.now();
 
-    const result = await client.execute(dto.cql, [], {
-      prepare: false,
-      keyspace: dto.keyspace,
-    });
+    let lastResult: import('cassandra-driver').types.ResultSet | null = null;
+    for (const statement of statements) {
+      lastResult = await client.execute(statement, [], {
+        prepare: false,
+        keyspace: dto.keyspace,
+      });
+    }
 
     const executionTime = Date.now() - start;
-    const columns = result.columns ? result.columns.map((c) => c.name) : [];
-    const rows = (result.rows ?? []).map((row) =>
+
+    if (!lastResult) {
+      return { columns: [], rows: [], rowCount: 0, executionTime, statementsExecuted: 0 };
+    }
+
+    const columns = lastResult.columns ? lastResult.columns.map((c) => c.name) : [];
+    const rows = (lastResult.rows ?? []).map((row) =>
       columns.reduce(
         (acc, col) => {
           const val = row[col];
@@ -33,7 +42,31 @@ export class QueryService {
       rows,
       rowCount: rows.length,
       executionTime,
+      statementsExecuted: statements.length,
     };
+  }
+
+  private splitStatements(cql: string): string[] {
+    const statements: string[] = [];
+    let current = '';
+    let inString = false;
+
+    for (let i = 0; i < cql.length; i++) {
+      const ch = cql[i];
+      if (ch === "'" && cql[i - 1] !== '\\') inString = !inString;
+      if (ch === ';' && !inString) {
+        const trimmed = current.trim();
+        if (trimmed) statements.push(trimmed);
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+
+    const trimmed = current.trim();
+    if (trimmed) statements.push(trimmed);
+
+    return statements;
   }
 
   private serializeValue(val: unknown): unknown {
