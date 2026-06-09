@@ -12,14 +12,20 @@ export function SchemaTree({ refreshTrigger, onTableClick }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (refreshTrigger === 0) return;
+  function fetchKeyspaces() {
     setLoading(true);
+    setTables({});
+    setExpanded(new Set());
     api
       .getKeyspaces()
       .then(setKeyspaces)
       .catch(() => {})
       .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    if (refreshTrigger === 0) return;
+    fetchKeyspaces();
   }, [refreshTrigger]);
 
   async function toggleKeyspace(ks: string) {
@@ -40,7 +46,10 @@ export function SchemaTree({ refreshTrigger, onTableClick }: Props) {
 
   return (
     <div className="schema-tree">
-      <div className="schema-tree-header">Schema</div>
+      <div className="schema-tree-header">
+        Schema
+        <button className="btn-refresh" onClick={fetchKeyspaces} title="Refresh schema">↺</button>
+      </div>
       {loading && <div className="tree-loading">Loading…</div>}
       {keyspaces.map((ks) => (
         <div key={ks} className="ks-item">

@@ -105,6 +105,9 @@ html, body, #root {
 }
 
 .schema-tree-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 8px 12px;
   font-size: 11px;
   font-weight: 700;
@@ -113,6 +116,19 @@ html, body, #root {
   color: var(--text-dim);
   border-bottom: 1px solid var(--border);
 }
+
+.btn-refresh {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+.btn-refresh:hover { color: var(--accent); background: var(--bg3); }
 
 .tree-loading {
   padding: 8px 12px;
