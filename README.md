@@ -11,27 +11,42 @@ Interface web para explorar e executar queries CQL em um cluster Apache Cassandr
 - **Editor CQL** — syntax highlighting, histórico de comandos e atalho `Ctrl+Enter` para executar
 - **Resultados em tabela** — exibe colunas, linhas, contagem e tempo de execução
 
-## Rodando com Docker
+## Rodando com Docker Compose
 
-A forma mais simples — tudo em um único container:
-
-```bash
-docker pull gustavoleitao/cassandra-playground   # ou use a imagem local abaixo
-```
-
-Ou construa localmente:
+A forma mais simples — sobe o Cassandra e o Playground juntos:
 
 ```bash
 git clone git@github.com:gustavoleitao/cassandra-playground.git
 cd cassandra-playground
 
-docker build -t cassandra-playground .
-docker run -p 3001:3001 cassandra-playground
+docker compose up
 ```
 
-Acesse **http://localhost:3001** no navegador.
+Aguarde o Cassandra inicializar (~1 minuto) e acesse **http://localhost:3001**.
 
-> O container não inclui um nó Cassandra. É necessário ter um cluster acessível na rede.
+No formulário de conexão, use:
+
+| Campo      | Valor         |
+|------------|---------------|
+| Host       | `cassandra`   |
+| Porta      | `9042`        |
+| Datacenter | `datacenter1` |
+
+Os dados do Cassandra ficam no volume `cassandra_data` e persistem entre reinicializações. Para apagar tudo:
+
+```bash
+docker compose down -v
+```
+
+## Rodando apenas o Playground
+
+Se você já tem um cluster Cassandra disponível na rede:
+
+```bash
+docker run -p 3001:3001 gustavoleitao/cassandra-playground
+```
+
+Acesse **http://localhost:3001** e informe os dados do seu cluster no formulário de conexão.
 
 ## Desenvolvimento local
 
