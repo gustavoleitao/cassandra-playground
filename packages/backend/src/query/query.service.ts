@@ -17,7 +17,7 @@ export class QueryService {
 
     const executionTime = Date.now() - start;
     const columns = result.columns ? result.columns.map((c) => c.name) : [];
-    const rows = result.rows.map((row) =>
+    const rows = (result.rows ?? []).map((row) =>
       columns.reduce(
         (acc, col) => {
           const val = row[col];
